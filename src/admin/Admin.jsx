@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchDonations, approveDonation } from './googleScriptApi.js'
+import html2pdf from 'html2pdf.js'
 import './admin.css'
 
 function formatCurrency(n) {
@@ -86,13 +87,8 @@ export default function Admin() {
       return
     }
     
-    // Create hidden iframe for printing
-    const iframe = document.createElement('iframe')
-    iframe.style.position = 'absolute'
-    iframe.style.width = '0'
-    iframe.style.height = '0'
-    iframe.style.border = 'none'
-    document.body.appendChild(iframe)
+    // Detect if mobile device
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     
     const logoUrl = window.location.origin + '/like.jpg'
     const bniBankLogo = window.location.origin + '/bni.jpg'
@@ -453,21 +449,50 @@ export default function Admin() {
       </div>
     </body></html>`
     
-    const iframeDoc = iframe.contentWindow.document
-    iframeDoc.open()
-    iframeDoc.write(html)
-    iframeDoc.close()
+    // Create temporary container
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = html
+    tempDiv.style.position = 'absolute'
+    tempDiv.style.left = '-9999px'
+    tempDiv.style.top = '-9999px'
+    document.body.appendChild(tempDiv)
     
-    // Wait for content to load, then print
-    iframe.onload = () => {
-      setTimeout(() => {
-        iframe.contentWindow.print()
-        
-        // Remove iframe after printing (or if user cancels)
+    if (isMobile) {
+      // On mobile: Direct download PDF
+      const opt = {
+        margin: 0,
+        filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' }
+      }
+      
+      html2pdf().set(opt).from(tempDiv.querySelector('.container')).save().then(() => {
+        document.body.removeChild(tempDiv)
+      })
+    } else {
+      // On desktop: Print dialog
+      const iframe = document.createElement('iframe')
+      iframe.style.position = 'absolute'
+      iframe.style.width = '0'
+      iframe.style.height = '0'
+      iframe.style.border = 'none'
+      document.body.appendChild(iframe)
+      
+      const iframeDoc = iframe.contentWindow.document
+      iframeDoc.open()
+      iframeDoc.write(html)
+      iframeDoc.close()
+      
+      iframe.onload = () => {
         setTimeout(() => {
-          document.body.removeChild(iframe)
-        }, 1000)
-      }, 250)
+          iframe.contentWindow.print()
+          setTimeout(() => {
+            document.body.removeChild(iframe)
+            document.body.removeChild(tempDiv)
+          }, 1000)
+        }, 250)
+      }
     }
   }
 
