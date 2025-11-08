@@ -98,7 +98,7 @@ export default function Admin() {
     const bniBankLogo = window.location.origin + '/bni.jpg'
     const bsiBankLogo = window.location.origin + '/bsi.jpg'
     
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Bukti Penerimaan Donasi - LIKE Foundation</title>
+    const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Bukti Penerimaan Donasi - LIKE Foundation</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -112,14 +112,19 @@ export default function Admin() {
           font-family: 'Poppins', Arial, sans-serif; 
           background: white;
           padding: 0;
+          margin: 0;
+          overflow-x: auto;
         }
         .container {
           width: 297mm;
           height: 210mm;
+          min-width: 297mm;
+          min-height: 210mm;
           margin: 0 auto;
           background: white;
           position: relative;
           padding: 15px;
+          box-sizing: border-box;
         }
         .header-section {
           display: flex;
@@ -325,64 +330,9 @@ export default function Admin() {
         }
         @media print {
           body { padding: 0; }
-        }
-        @media screen and (max-width: 768px) {
-          body { padding: 10px; }
           .container {
-            width: 100%;
-            height: auto;
-            padding: 10px;
-          }
-          .header-section {
-            flex-direction: column;
-            gap: 15px;
-          }
-          .blue-box {
-            width: 100%;
-          }
-          .blue-box::after {
-            display: none;
-          }
-          .top-right {
-            padding-left: 0;
-          }
-          .org-header {
-            flex-wrap: wrap;
-          }
-          .logo-like {
-            font-size: 20px;
-            padding: 6px 12px;
-          }
-          .org-title {
-            font-size: 20px;
-          }
-          .main-content {
-            flex-direction: column;
-            gap: 20px;
-          }
-          .info-row {
-            flex-direction: column;
-            gap: 5px;
-          }
-          .info-label {
-            width: 100%;
-          }
-          .info-colon {
-            display: none;
-          }
-          .info-value {
-            width: 100%;
-          }
-          .bottom-section {
-            position: relative;
-            bottom: auto;
-            right: auto;
-            width: 100%;
-            margin-top: 20px;
-          }
-          .signature-container {
-            flex-direction: column;
-            gap: 15px;
+            width: 297mm !important;
+            height: 210mm !important;
           }
         }
       </style>
