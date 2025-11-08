@@ -1,0 +1,88 @@
+# Dependencies
+node_modules
+package-lock.json
+
+# Build output
+dist
+dist-ssr
+build
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage
+*.lcov
+.nyc_output
+
+# Cache directories
+.cache
+.vite
+.rollup.cache
+.turbo
+.next
+.nuxt
+.output
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.tmp
+.temp
+
+# Debug files
+*.stackdump
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Documentation files (development notes)
+QUICK_START.md
+README_FIX_CONNECTION.md
+TROUBLESHOOTING.md
+IMPLEMENTATION_NOTES.md
+DEPLOYMENT_CHECKLIST.md

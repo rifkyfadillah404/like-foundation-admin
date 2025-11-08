@@ -1,0 +1,121 @@
+.welcome-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.welcome-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.welcome-content {
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 448px;
+  margin-top: -48px;
+}
+
+.welcome-logo-container {
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+}
+
+.welcome-logo {
+  height: 192px;
+  width: auto;
+}
+
+.welcome-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  margin-top: -24px;
+}
+
+.welcome-description {
+  font-size: 14px;
+  color: white;
+  margin-bottom: 40px;
+  max-width: 384px;
+  margin-left: auto;
+  margin-right: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  line-height: 1.6;
+  padding: 0 16px;
+}
+
+.welcome-button {
+  background: linear-gradient(to bottom, #2dd4bf 0%, #14b8a6 100%);
+  color: white;
+  font-weight: 700;
+  padding: 12px 64px;
+  border-radius: 9999px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3), inset 0 -2px 5px rgba(0, 0, 0, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 18px;
+  margin-top: 64px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.welcome-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-button:active {
+  transform: scale(0.95);
+}
+
+/* Responsive */
+@media screen and (min-width: 640px) {
+  .welcome-content {
+    margin-top: -64px;
+  }
+
+  .welcome-logo {
+    height: 224px;
+  }
+
+  .welcome-title {
+    font-size: 30px;
+  }
+
+  .welcome-description {
+    font-size: 16px;
+    margin-bottom: 56px;
+  }
+
+  .welcome-button {
+    margin-top: 80px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .welcome-logo {
+    height: 256px;
+  }
+
+  .welcome-title {
+    font-size: 36px;
+  }
+
+  .welcome-description {
+    font-size: 18px;
+  }
+}
