@@ -46,6 +46,8 @@ export default function Admin() {
   const [error, setError] = useState('')
   const [donations, setDonations] = useState([])
   const [approving, setApproving] = useState({})
+  const [searchInput, setSearchInput] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const loadDonations = async () => {
     try {
@@ -63,6 +65,22 @@ export default function Admin() {
   useEffect(() => {
     loadDonations()
   }, [])
+
+  const handleSearch = () => {
+    const trimmedInput = searchInput.trim()
+    setSearchQuery(trimmedInput)
+  }
+
+  const handleClearSearch = () => {
+    setSearchInput('')
+    setSearchQuery('')
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
 
   async function handleApprove(item) {
     const rowNumber = item.rowNumber
@@ -86,9 +104,6 @@ export default function Admin() {
       alert('Silakan approve dulu sebelum download PDF')
       return
     }
-    
-    // Detect if mobile device
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     
     const logoUrl = window.location.origin + '/like.jpg'
     const bniBankLogo = window.location.origin + '/bni.jpg'
@@ -457,43 +472,22 @@ export default function Admin() {
     tempDiv.style.top = '-9999px'
     document.body.appendChild(tempDiv)
     
-    if (isMobile) {
-      // On mobile: Direct download PDF
-      const opt = {
-        margin: 0,
-        filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' }
-      }
-      
-      html2pdf().set(opt).from(tempDiv.querySelector('.container')).save().then(() => {
-        document.body.removeChild(tempDiv)
-      })
-    } else {
-      // On desktop: Print dialog
-      const iframe = document.createElement('iframe')
-      iframe.style.position = 'absolute'
-      iframe.style.width = '0'
-      iframe.style.height = '0'
-      iframe.style.border = 'none'
-      document.body.appendChild(iframe)
-      
-      const iframeDoc = iframe.contentWindow.document
-      iframeDoc.open()
-      iframeDoc.write(html)
-      iframeDoc.close()
-      
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow.print()
-          setTimeout(() => {
-            document.body.removeChild(iframe)
-            document.body.removeChild(tempDiv)
-          }, 1000)
-        }, 250)
-      }
+    // Direct download PDF for all devices
+    const opt = {
+      margin: 0,
+      filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' }
     }
+    
+    html2pdf().set(opt).from(tempDiv.querySelector('.container')).save().then(() => {
+      document.body.removeChild(tempDiv)
+    }).catch((error) => {
+      console.error('PDF generation error:', error)
+      document.body.removeChild(tempDiv)
+      alert('Gagal membuat PDF. Silakan coba lagi.')
+    })
   }
 
   if (loading) {
@@ -530,8 +524,27 @@ export default function Admin() {
     )
   }
 
-  const pendingCount = donations.filter(d => d.approval === 'Pending').length
-  const approvedCount = donations.filter(d => d.approval === 'Approved' || d.approval === 1 || d.approval === '1').length
+  // Filter donations based on search query
+  const filteredDonations = donations.filter(item => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase().trim()
+    
+    // Convert all fields to string first to handle numbers
+    const namaStr = String(item.nama || '').toLowerCase()
+    const noWaStr = String(item.noWa || '').toLowerCase()
+    const programStr = String(item.program || '').toLowerCase()
+    const alamatStr = String(item.alamat || '').toLowerCase()
+    
+    const namaMatch = namaStr.includes(query)
+    const noWaMatch = noWaStr.includes(query)
+    const programMatch = programStr.includes(query)
+    const alamatMatch = alamatStr.includes(query)
+    
+    return namaMatch || noWaMatch || programMatch || alamatMatch
+  })
+
+  const pendingCount = filteredDonations.filter(d => d.approval === 'Pending').length
+  const approvedCount = filteredDonations.filter(d => d.approval === 'Approved' || d.approval === 1 || d.approval === '1').length
 
   return (
     <div className="admin-container">
@@ -555,7 +568,7 @@ export default function Admin() {
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                 <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
               </svg>
-              Total: {donations.length}
+              Total: {filteredDonations.length}
             </div>
             <div className="stat-badge pending">
               <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
@@ -574,6 +587,118 @@ export default function Admin() {
       </div>
 
       <div className="admin-content">
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: '12px', maxWidth: '600px' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <svg 
+                style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#94a3b8', pointerEvents: 'none' }}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Cari nama, no WA, program, atau alamat..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px 12px 48px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  fontFamily: 'Poppins, sans-serif',
+                  outline: 'none',
+                  transition: 'all 0.2s ease',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0'
+                  e.target.style.boxShadow = 'none'
+                }}
+              />
+              {searchInput && (
+                <button
+                  onClick={handleClearSearch}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f1f5f9'
+                    e.currentTarget.style.color = '#475569'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = '#94a3b8'
+                  }}
+                >
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <button
+              onClick={handleSearch}
+              style={{
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontWeight: '600',
+                fontFamily: 'Poppins, sans-serif',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)'
+              }}
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Search
+            </button>
+          </div>
+          {searchQuery && (
+            <div style={{ marginTop: '8px', fontSize: '13px', color: '#64748b' }}>
+              Menampilkan {filteredDonations.length} dari {donations.length} data untuk "{searchQuery}"
+            </div>
+          )}
+        </div>
+        
         <div className="table-card">
           <div className="table-wrapper">
             <table className="admin-table">
@@ -589,82 +714,102 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {donations.map((item) => {
-                  const isApproved = item.approval === 'Approved' || item.approval === 1 || item.approval === '1'
-                  const isApproving = approving[item.rowNumber]
-                  
-                  return (
-                    <tr key={item.rowNumber}>
-                      <td>{formatDate(item.tanggal)}</td>
-                      <td>
-                        <div className="donor-name">{item.nama}</div>
-                      </td>
-                      <td>
-                        <span className="phone-number">{item.noWa}</span>
-                      </td>
-                      <td>{item.program}</td>
-                      <td>
-                        <span className="donation-amount">
-                          {formatCurrency(item.nominal || 0)}
-                        </span>
-                      </td>
-                      <td className="text-center">
-                        {isApproved ? (
-                          <span className="status-badge approved">
-                            <svg className="status-icon" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            Approved
-                          </span>
-                        ) : (
-                          <span className="status-badge pending">
-                            <svg className="status-icon" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                            </svg>
-                            Pending
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          {!isApproved ? (
-                            <button
-                              onClick={() => handleApprove(item)}
-                              disabled={isApproving}
-                              className="btn btn-primary"
-                            >
-                              {isApproving ? (
-                                <>
-                                  <span className="loading-spinner"></span>
-                                  Loading...
-                                </>
-                              ) : (
-                                <>
-                                  <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  Approve
-                                </>
-                              )}
-                            </button>
-                          ) : (
-                            <div style={{ padding: '10px 18px', color: '#94a3b8' }}>—</div>
-                          )}
-                          <button
-                            onClick={() => handleDownload(item)}
-                            disabled={!isApproved}
-                            className="btn btn-secondary"
-                          >
-                            <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Export
-                          </button>
+                {filteredDonations.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '40px 20px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                        <svg width="48" height="48" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <p style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: '0 0 4px 0' }}>
+                            Tidak ada data ditemukan
+                          </p>
+                          <p style={{ fontSize: '13px', color: '#94a3b8', margin: '0' }}>
+                            {searchQuery ? `Tidak ada hasil untuk "${searchQuery}"` : 'Belum ada data donasi'}
+                          </p>
                         </div>
-                      </td>
-                    </tr>
-                  )
-                })}
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredDonations.map((item) => {
+                    const isApproved = item.approval === 'Approved' || item.approval === 1 || item.approval === '1'
+                    const isApproving = approving[item.rowNumber]
+                    
+                    return (
+                      <tr key={item.rowNumber}>
+                        <td>{formatDate(item.tanggal)}</td>
+                        <td>
+                          <div className="donor-name">{item.nama}</div>
+                        </td>
+                        <td>
+                          <span className="phone-number">{item.noWa}</span>
+                        </td>
+                        <td>{item.program}</td>
+                        <td>
+                          <span className="donation-amount">
+                            {formatCurrency(item.nominal || 0)}
+                          </span>
+                        </td>
+                        <td className="text-center">
+                          {isApproved ? (
+                            <span className="status-badge approved">
+                              <svg className="status-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              Approved
+                            </span>
+                          ) : (
+                            <span className="status-badge pending">
+                              <svg className="status-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                              </svg>
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            {!isApproved ? (
+                              <button
+                                onClick={() => handleApprove(item)}
+                                disabled={isApproving}
+                                className="btn btn-primary"
+                              >
+                                {isApproving ? (
+                                  <>
+                                    <span className="loading-spinner"></span>
+                                    Loading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Approve
+                                  </>
+                                )}
+                              </button>
+                            ) : (
+                              <div style={{ padding: '10px 18px', color: '#94a3b8' }}>—</div>
+                            )}
+                            <button
+                              onClick={() => handleDownload(item)}
+                              disabled={!isApproved}
+                              className="btn btn-secondary"
+                            >
+                              <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Export
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
               </tbody>
             </table>
           </div>
