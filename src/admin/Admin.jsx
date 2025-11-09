@@ -105,6 +105,17 @@ export default function Admin() {
       return
     }
     
+    // Sanitize filename - remove special characters
+    const sanitizeName = (name) => {
+      return String(name || 'Donatur')
+        .replace(/[^a-zA-Z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+    }
+    
+    const sanitizedNama = sanitizeName(item.nama)
+    const tanggalStr = String(item.tanggal || '').split('T')[0].replace(/\//g, '-')
+    
     const logoUrl = window.location.origin + '/like.jpg'
     const bniBankLogo = window.location.origin + '/bni.jpg'
     const bsiBankLogo = window.location.origin + '/bsi.jpg'
@@ -487,7 +498,7 @@ export default function Admin() {
     // Direct download PDF for all browsers with landscape orientation
     const opt = {
       margin: 0,
-      filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
+      filename: `Bukti-Donasi-${sanitizedNama}-${tanggalStr}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
@@ -738,6 +749,9 @@ export default function Admin() {
                   <th>Nama Donatur</th>
                   <th>No. WhatsApp</th>
                   <th>Program</th>
+                  <th>Catatan Program</th>
+                  <th>Ket. Pembayaran</th>
+                  <th>Catatan</th>
                   <th className="text-right">Jumlah Donasi</th>
                   <th className="text-center">Status</th>
                   <th className="text-center">Tgl Approval</th>
@@ -747,7 +761,7 @@ export default function Admin() {
               <tbody>
                 {filteredDonations.length === 0 ? (
                   <tr>
-                    <td colSpan="8" style={{ textAlign: 'center', padding: '40px 20px' }}>
+                    <td colSpan="11" style={{ textAlign: 'center', padding: '40px 20px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                         <svg width="48" height="48" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -778,6 +792,17 @@ export default function Admin() {
                           <span className="phone-number">{item.noWa}</span>
                         </td>
                         <td>{item.program}</td>
+                        <td>
+                          <span style={{ fontSize: '12px', color: item.programCustom ? '#334155' : '#cbd5e1' }}>
+                            {item.programCustom || '—'}
+                          </span>
+                        </td>
+                        <td>{item.pembayaran}</td>
+                        <td>
+                          <span style={{ fontSize: '12px', color: item.noted ? '#334155' : '#cbd5e1' }}>
+                            {item.noted || '—'}
+                          </span>
+                        </td>
                         <td>
                           <span className="donation-amount">
                             {formatCurrency(item.nominal || 0)}
