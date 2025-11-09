@@ -105,24 +105,26 @@ export default function Admin() {
       return
     }
     
-    // Detect iOS/Safari
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-    
     const logoUrl = window.location.origin + '/like.jpg'
     const bniBankLogo = window.location.origin + '/bni.jpg'
     const bsiBankLogo = window.location.origin + '/bsi.jpg'
     
-    const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Bukti Penerimaan Donasi - LIKE Foundation</title>
+    const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=297mm, initial-scale=1.0"><title>Bukti Penerimaan Donasi - LIKE Foundation</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         @page {
+          size: 297mm 210mm;
           size: A4 landscape;
           margin: 0;
+        }
+        @media print {
+          html, body {
+            width: 297mm;
+            height: 210mm;
+          }
         }
         body { 
           font-family: 'Poppins', Arial, sans-serif; 
@@ -134,6 +136,8 @@ export default function Admin() {
         .container {
           width: 297mm;
           height: 210mm;
+          max-width: 297mm;
+          max-height: 210mm;
           min-width: 297mm;
           min-height: 210mm;
           margin: 0 auto;
@@ -141,6 +145,7 @@ export default function Admin() {
           position: relative;
           padding: 15px;
           box-sizing: border-box;
+          overflow: hidden;
         }
         .header-section {
           display: flex;
@@ -332,10 +337,16 @@ export default function Admin() {
           background: white;
         }
         @media print {
-          body { padding: 0; }
+          body { 
+            padding: 0;
+            width: 297mm;
+            height: 210mm;
+          }
           .container {
             width: 297mm !important;
             height: 210mm !important;
+            max-width: 297mm !important;
+            max-height: 210mm !important;
           }
         }
       </style>
@@ -388,15 +399,25 @@ export default function Admin() {
               <span class="info-value">${escapeHtml(item.terbilang || '')}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">Keterangan</span>
+              <span class="info-label">Ket. Pembayaran</span>
               <span class="info-colon">:</span>
               <span class="info-value">${escapeHtml(item.pembayaran || '')}</span>
             </div>
+            ${item.noted ? `<div class="info-row">
+              <span class="info-label">Catatan</span>
+              <span class="info-colon">:</span>
+              <span class="info-value">${escapeHtml(item.noted || '')}</span>
+            </div>` : ''}
             <div class="info-row">
               <span class="info-label">Untuk Program</span>
               <span class="info-colon">:</span>
               <span class="info-value">${escapeHtml(item.program || '')}</span>
             </div>
+            ${item.programCustom ? `<div class="info-row">
+              <span class="info-label">Catatan Program</span>
+              <span class="info-colon">:</span>
+              <span class="info-value">${escapeHtml(item.programCustom || '')}</span>
+            </div>` : ''}
           </div>
           
           <div class="right-info">
@@ -463,45 +484,40 @@ export default function Admin() {
     tempDiv.style.top = '-9999px'
     document.body.appendChild(tempDiv)
     
-    // For iOS/Safari: use print dialog instead of direct download
-    if (isIOS || isSafari) {
-      const printWindow = window.open('', '_blank')
-      if (printWindow) {
-        printWindow.document.write(html)
-        printWindow.document.close()
-        
-        // Wait for images to load
-        setTimeout(() => {
-          printWindow.print()
-          
-          // Clean up
-          setTimeout(() => {
-            printWindow.close()
-            document.body.removeChild(tempDiv)
-          }, 500)
-        }, 500)
-      } else {
-        alert('Pop-up diblokir. Silakan izinkan pop-up untuk download PDF.')
+    // Direct download PDF for all browsers with landscape orientation
+    const opt = {
+      margin: 0,
+      filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        letterRendering: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: [297, 210], 
+        orientation: 'landscape',
+        compress: true
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    }
+    
+    html2pdf()
+      .set(opt)
+      .from(tempDiv.querySelector('.container'))
+      .save()
+      .then(() => {
         document.body.removeChild(tempDiv)
-      }
-    } else {
-      // For other browsers: Direct download PDF
-      const opt = {
-        margin: 0,
-        filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' }
-      }
-      
-      html2pdf().set(opt).from(tempDiv.querySelector('.container')).save().then(() => {
-        document.body.removeChild(tempDiv)
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.error('PDF generation error:', error)
         document.body.removeChild(tempDiv)
         alert('Gagal membuat PDF. Silakan coba lagi.')
       })
-    }
   }
 
   if (loading) {
