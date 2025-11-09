@@ -116,7 +116,7 @@ export default function Admin() {
     const sanitizedNama = sanitizeName(item.nama)
     const tanggalStr = String(item.tanggal || '').split('T')[0].replace(/\//g, '-')
     
-    const logoUrl = window.location.origin + '/like.jpg'
+    const logoUrl = window.location.origin + '/3.png'
     const bniBankLogo = window.location.origin + '/bni.jpg'
     const bsiBankLogo = window.location.origin + '/bsi.jpg'
     
@@ -231,7 +231,6 @@ export default function Admin() {
         }
         .info-value {
           flex: 1;
-          border-bottom: 2px solid #333;
           padding-bottom: 2px;
           font-weight: 400;
           min-height: 20px;
@@ -322,7 +321,6 @@ export default function Admin() {
           margin-right: 10px;
         }
         .date-value {
-          border-bottom: 2px solid #333;
           display: inline-block;
           min-width: 200px;
           padding-bottom: 2px;
@@ -370,7 +368,7 @@ export default function Admin() {
           </div>
           <div class="top-right">
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-              <img src="${logoUrl}" alt="LIKE" style="width: 60px; height: 60px; object-fit: contain; background: #17a2b8; padding: 8px; border-radius: 8px;" />
+              <img src="${logoUrl}" alt="LIKE" style="width: 60px; height: 60px; object-fit: contain;" />
               <div style="font-size: 28px; font-weight: 700; color: #000;">foundation</div>
             </div>
             <div style="font-size: 13px; line-height: 1.6; color: #000;">
