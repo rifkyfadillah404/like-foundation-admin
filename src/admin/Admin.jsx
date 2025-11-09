@@ -32,6 +32,28 @@ function formatDate(dateStr) {
   }
 }
 
+function formatDatePDF(dateStr) {
+  if (!dateStr) {
+    const now = new Date()
+    const day = String(now.getDate()).padStart(2, '0')
+    const month = now.toLocaleDateString('id-ID', { month: 'long' })
+    const year = now.getFullYear()
+    return `${day} ${month} ${year}`
+  }
+  
+  try {
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return dateStr
+    
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = date.toLocaleDateString('id-ID', { month: 'long' })
+    const year = date.getFullYear()
+    return `${day} ${month} ${year}`
+  } catch (e) {
+    return dateStr
+  }
+}
+
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;')
@@ -469,7 +491,7 @@ export default function Admin() {
           <div class="date-row">
             <span class="date-label">Tanggal</span>
             <span class="info-colon">:</span>
-            <span class="date-value">${escapeHtml(formatDate(item.tanggal))}</span>
+            <span class="date-value">${escapeHtml(formatDatePDF(item.tanggal))}</span>
           </div>
           <div class="signature-container">
             <div class="signature-box">

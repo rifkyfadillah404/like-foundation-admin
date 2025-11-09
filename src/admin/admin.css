@@ -485,9 +485,8 @@
   .admin-table th,
   .admin-table td {
     padding: 12px 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
   }
 
   .admin-table th {
@@ -570,9 +569,8 @@
   .admin-table th,
   .admin-table td {
     padding: 10px 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
   }
 
   .admin-table th {
