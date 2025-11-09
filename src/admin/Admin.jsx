@@ -105,6 +105,11 @@ export default function Admin() {
       return
     }
     
+    // Detect iOS/Safari
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    
     const logoUrl = window.location.origin + '/like.jpg'
     const bniBankLogo = window.location.origin + '/bni.jpg'
     const bsiBankLogo = window.location.origin + '/bsi.jpg'
@@ -458,22 +463,45 @@ export default function Admin() {
     tempDiv.style.top = '-9999px'
     document.body.appendChild(tempDiv)
     
-    // Direct download PDF for all devices
-    const opt = {
-      margin: 0,
-      filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' }
+    // For iOS/Safari: use print dialog instead of direct download
+    if (isIOS || isSafari) {
+      const printWindow = window.open('', '_blank')
+      if (printWindow) {
+        printWindow.document.write(html)
+        printWindow.document.close()
+        
+        // Wait for images to load
+        setTimeout(() => {
+          printWindow.print()
+          
+          // Clean up
+          setTimeout(() => {
+            printWindow.close()
+            document.body.removeChild(tempDiv)
+          }, 500)
+        }, 500)
+      } else {
+        alert('Pop-up diblokir. Silakan izinkan pop-up untuk download PDF.')
+        document.body.removeChild(tempDiv)
+      }
+    } else {
+      // For other browsers: Direct download PDF
+      const opt = {
+        margin: 0,
+        filename: `Bukti-Donasi-${item.nama}-${formatDate(item.tanggal)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: [297, 210], orientation: 'landscape' }
+      }
+      
+      html2pdf().set(opt).from(tempDiv.querySelector('.container')).save().then(() => {
+        document.body.removeChild(tempDiv)
+      }).catch((error) => {
+        console.error('PDF generation error:', error)
+        document.body.removeChild(tempDiv)
+        alert('Gagal membuat PDF. Silakan coba lagi.')
+      })
     }
-    
-    html2pdf().set(opt).from(tempDiv.querySelector('.container')).save().then(() => {
-      document.body.removeChild(tempDiv)
-    }).catch((error) => {
-      console.error('PDF generation error:', error)
-      document.body.removeChild(tempDiv)
-      alert('Gagal membuat PDF. Silakan coba lagi.')
-    })
   }
 
   if (loading) {
@@ -573,11 +601,11 @@ export default function Admin() {
       </div>
 
       <div className="admin-content">
-        <div style={{ marginBottom: '20px' }}>
-          <div style={{ display: 'flex', gap: '12px', maxWidth: '600px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '8px', maxWidth: '450px' }}>
             <div style={{ position: 'relative', flex: 1 }}>
               <svg 
-                style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', color: '#94a3b8', pointerEvents: 'none' }}
+                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94a3b8', pointerEvents: 'none' }}
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -592,10 +620,10 @@ export default function Admin() {
                 onKeyPress={handleKeyPress}
                 style={{
                   width: '100%',
-                  padding: '12px 16px 12px 48px',
+                  padding: '8px 12px 8px 36px',
                   border: '2px solid #e2e8f0',
-                  borderRadius: '12px',
-                  fontSize: '14px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
                   fontFamily: 'Poppins, sans-serif',
                   outline: 'none',
                   transition: 'all 0.2s ease',
@@ -603,7 +631,7 @@ export default function Admin() {
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#3b82f6'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)'
+                  e.target.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.1)'
                 }}
                 onBlur={(e) => {
                   e.target.style.borderColor = '#e2e8f0'
@@ -615,7 +643,7 @@ export default function Admin() {
                   onClick={handleClearSearch}
                   style={{
                     position: 'absolute',
-                    right: '12px',
+                    right: '8px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
@@ -638,7 +666,7 @@ export default function Admin() {
                     e.currentTarget.style.color = '#94a3b8'
                   }}
                 >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -647,32 +675,32 @@ export default function Admin() {
             <button
               onClick={handleSearch}
               style={{
-                padding: '12px 24px',
+                padding: '8px 16px',
                 background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '12px',
-                fontSize: '14px',
+                borderRadius: '8px',
+                fontSize: '13px',
                 fontWeight: '600',
                 fontFamily: 'Poppins, sans-serif',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+                boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)',
                 whiteSpace: 'nowrap'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+                e.currentTarget.style.boxShadow = '0 3px 8px rgba(59, 130, 246, 0.4)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(59, 130, 246, 0.3)'
               }}
             >
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               Search
@@ -696,13 +724,14 @@ export default function Admin() {
                   <th>Program</th>
                   <th className="text-right">Jumlah Donasi</th>
                   <th className="text-center">Status</th>
+                  <th className="text-center">Tgl Approval</th>
                   <th className="text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredDonations.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '40px 20px' }}>
+                    <td colSpan="8" style={{ textAlign: 'center', padding: '40px 20px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                         <svg width="48" height="48" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -753,6 +782,15 @@ export default function Admin() {
                               </svg>
                               Pending
                             </span>
+                          )}
+                        </td>
+                        <td className="text-center">
+                          {item.tanggalApproval ? (
+                            <span style={{ fontSize: '12px', color: '#64748b' }}>
+                              {formatDate(item.tanggalApproval)}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: '#cbd5e1' }}>—</span>
                           )}
                         </td>
                         <td>
