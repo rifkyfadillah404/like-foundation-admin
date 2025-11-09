@@ -5,7 +5,7 @@ export default function WelcomeScreen({ onEnter }) {
   return (
     <div 
       className="welcome-container"
-      style={{ backgroundImage: 'url(/1.jpg)' }}
+      style={{ backgroundImage: 'url(/2.jpg)' }}
     >
       <div className="welcome-overlay"></div>
       

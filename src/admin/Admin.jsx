@@ -117,8 +117,6 @@ export default function Admin() {
     const tanggalStr = String(item.tanggal || '').split('T')[0].replace(/\//g, '-')
     
     const logoUrl = window.location.origin + '/like.jpg'
-    const bniBankLogo = window.location.origin + '/bni.jpg'
-    const bsiBankLogo = window.location.origin + '/bsi.jpg'
     
     const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=297mm, initial-scale=1.0"><title>Bukti Penerimaan Donasi - LIKE Foundation</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -256,23 +254,24 @@ export default function Admin() {
           font-size: 11px;
         }
         .bank-badge {
-          padding: 4px 10px;
+          padding: 4px 12px;
           border-radius: 3px;
-          min-width: 60px;
-          height: 26px;
+          min-width: 50px;
+          height: 24px;
           text-align: center;
-          margin-right: 10px;
+          margin-right: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: white;
-          border: 1px solid #e5e7eb;
+          font-weight: 700;
+          font-size: 11px;
+          color: white;
         }
-        .bank-badge img {
-          height: 20px;
-          width: auto;
-          max-width: 50px;
-          object-fit: contain;
+        .bank-badge.bni {
+          background: #ff6600;
+        }
+        .bank-badge.bsi {
+          background: #0066cc;
         }
         .bank-account {
           font-weight: 700;
@@ -364,19 +363,19 @@ export default function Admin() {
     </head><body>
       <div class="container">
         <div class="header-section">
-          <div style="background: #2d5f7e; color: white; padding: 25px 30px; width: 380px;">
-            <h1 style="font-size: 20px; font-weight: 400; margin: 0 0 5px 0;">Bukti</h1>
-            <h2 style="font-size: 28px; font-weight: 700; line-height: 1.2; margin: 0;">Penerimaan<br>Donasi</h2>
+          <div style="background: #2d5f7e; color: white; padding: 30px; width: 400px;">
+            <h1 style="font-size: 18px; font-weight: 400; margin: 0 0 8px 0;">Bukti</h1>
+            <h2 style="font-size: 32px; font-weight: 700; line-height: 1.1; margin: 0;">Penerimaan<br>Donasi</h2>
           </div>
           <div class="top-right">
-            <div class="org-header">
-              <img src="${logoUrl}" alt="LIKE" style="width: 50px; height: 50px; object-fit: contain;" />
-              <div class="org-title">foundation</div>
-              <div class="org-address">
-                <strong>Jl. Mayjend Panjaitan - Karang Kulon</strong><br>
-                Kel. Papahan, Kec. Tasikmadu,<br>
-                Kab. Karanganyar, Jawa Tengah.
-              </div>
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+              <img src="${logoUrl}" alt="LIKE" style="width: 60px; height: 60px; object-fit: contain; background: #17a2b8; padding: 8px; border-radius: 8px;" />
+              <div style="font-size: 28px; font-weight: 700; color: #000;">foundation</div>
+            </div>
+            <div style="font-size: 13px; line-height: 1.6; color: #000;">
+              <strong>Jl. Mayjend Panjaitan - Karang Kulon</strong><br>
+              Kel. Papahan, Kec. Tasikmadu,<br>
+              Kab. Karanganyar, Jawa Tengah.
             </div>
           </div>
         </div>
@@ -392,7 +391,7 @@ export default function Admin() {
             <div class="info-row">
               <span class="info-label">No. WhatsApp</span>
               <span class="info-colon">:</span>
-              <span class="info-value">${escapeHtml(item.noWa || '')}</span>
+              <span class="info-value">0${escapeHtml(item.noWa || '')}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Alamat</span>
@@ -437,17 +436,17 @@ export default function Admin() {
             </div>
             <div class="bank-list">
               <div class="bank-item">
-                <span class="bank-badge"><img src="${bniBankLogo}" alt="BNI" /></span>
+                <span class="bank-badge bni">BNI</span>
                 <span class="bank-account">555 - 8800 - 585</span>
-                <span class="bank-name">a.n. Lingkar Insan Kebaikan</span>
+                <span class="bank-name">a.n. Lingkar Insan Keb...</span>
               </div>
               <div class="bank-item">
-                <span class="bank-badge"><img src="${bsiBankLogo}" alt="BSI" /></span>
+                <span class="bank-badge bsi">BSI</span>
                 <span class="bank-account">730 - 8910 - 045</span>
-                <span class="bank-name">a.n. Wakaf Produktif Kebaikan</span>
+                <span class="bank-name">a.n. Wakaf Produktif K...</span>
               </div>
               <div class="bank-item">
-                <span class="bank-badge"><img src="${bsiBankLogo}" alt="BSI" /></span>
+                <span class="bank-badge bsi">BSI</span>
                 <span class="bank-account">730 - 8910 - 339</span>
                 <span class="bank-name">a.n. Solidaritas Al Aqsha</span>
               </div>
