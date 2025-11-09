@@ -142,22 +142,10 @@ export default function Admin() {
           margin-bottom: 20px;
         }
         .blue-box {
-          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+          background: #2d5f7e;
           color: white;
-          padding: 20px 30px;
-          position: relative;
-          width: 280px;
-          box-shadow: 4px 4px 10px rgba(139, 92, 246, 0.4);
-        }
-        .blue-box::after {
-          content: '';
-          position: absolute;
-          right: -20px;
-          top: 0;
-          bottom: 0;
-          width: 40px;
-          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-          border-radius: 0 50% 50% 0;
+          padding: 25px 30px;
+          width: 380px;
         }
         .blue-box h1 {
           font-size: 22px;
@@ -247,10 +235,10 @@ export default function Admin() {
           font-size: 11px;
         }
         .bank-badge {
-          padding: 6px 12px;
-          border-radius: 6px;
-          min-width: 80px;
-          height: 32px;
+          padding: 4px 10px;
+          border-radius: 3px;
+          min-width: 60px;
+          height: 26px;
           text-align: center;
           margin-right: 10px;
           display: flex;
@@ -258,12 +246,11 @@ export default function Admin() {
           justify-content: center;
           background: white;
           border: 1px solid #e5e7eb;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .bank-badge img {
-          height: 22px;
+          height: 20px;
           width: auto;
-          max-width: 65px;
+          max-width: 50px;
           object-fit: contain;
         }
         .bank-account {
@@ -327,7 +314,7 @@ export default function Admin() {
           flex: 1;
         }
         .signature-title {
-          background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+          background: #2d5f7e;
           color: white;
           padding: 10px;
           font-size: 13px;
@@ -336,7 +323,7 @@ export default function Admin() {
         }
         .signature-space {
           height: 100px;
-          border: 2px solid #9333ea;
+          border: 2px solid #2d5f7e;
           background: white;
         }
         @media print {
@@ -350,17 +337,16 @@ export default function Admin() {
     </head><body>
       <div class="container">
         <div class="header-section">
-          <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 20px 30px; position: relative; width: 280px; box-shadow: 4px 4px 10px rgba(139, 92, 246, 0.4);">
-            <h1 style="font-size: 22px; font-weight: 400; margin-bottom: 5px; margin: 0 0 5px 0;">Bukti</h1>
-            <h2 style="font-size: 32px; font-weight: 700; line-height: 1.2; margin: 0;">Penerimaan<br>Donasi</h2>
-            <div style="position: absolute; right: -20px; top: 0; bottom: 0; width: 40px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 0 50% 50% 0;"></div>
+          <div style="background: #2d5f7e; color: white; padding: 25px 30px; width: 380px;">
+            <h1 style="font-size: 20px; font-weight: 400; margin: 0 0 5px 0;">Bukti</h1>
+            <h2 style="font-size: 28px; font-weight: 700; line-height: 1.2; margin: 0;">Penerimaan<br>Donasi</h2>
           </div>
           <div class="top-right">
             <div class="org-header">
               <img src="${logoUrl}" alt="LIKE" style="width: 50px; height: 50px; object-fit: contain;" />
               <div class="org-title">foundation</div>
               <div class="org-address">
-                📍 <strong>Jl. Mayjend Panjaitan - Karang Kulon</strong><br>
+                <strong>Jl. Mayjend Panjaitan - Karang Kulon</strong><br>
                 Kel. Papahan, Kec. Tasikmadu,<br>
                 Kab. Karanganyar, Jawa Tengah.
               </div>
@@ -410,7 +396,7 @@ export default function Admin() {
           
           <div class="right-info">
             <div class="donation-text">
-              💰 Donasi dapat dikirimkan melalui nomer rekening
+              Donasi dapat dikirimkan melalui nomer rekening
             </div>
             <div class="bank-list">
               <div class="bank-item">
@@ -431,7 +417,7 @@ export default function Admin() {
             </div>
             
             <div class="whatsapp-section">
-              <div class="whatsapp-title">📱 Konfirmasi ke nomer WhatsApp</div>
+              <div class="whatsapp-title">Konfirmasi ke nomer WhatsApp</div>
               <div class="whatsapp-item">
                 <span class="whatsapp-number">0821 - 3636 - 3648</span>
                 <span class="whatsapp-label">(Hotline LIKE Foundation)</span>
