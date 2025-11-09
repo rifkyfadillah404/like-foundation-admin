@@ -117,6 +117,8 @@ export default function Admin() {
     const tanggalStr = String(item.tanggal || '').split('T')[0].replace(/\//g, '-')
     
     const logoUrl = window.location.origin + '/like.jpg'
+    const bniBankLogo = window.location.origin + '/bni.jpg'
+    const bsiBankLogo = window.location.origin + '/bsi.jpg'
     
     const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=297mm, initial-scale=1.0"><title>Bukti Penerimaan Donasi - LIKE Foundation</title>
       <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -254,24 +256,23 @@ export default function Admin() {
           font-size: 11px;
         }
         .bank-badge {
-          padding: 4px 12px;
+          padding: 4px 10px;
           border-radius: 3px;
-          min-width: 50px;
-          height: 24px;
+          min-width: 60px;
+          height: 26px;
           text-align: center;
           margin-right: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 700;
-          font-size: 11px;
-          color: white;
+          background: white;
+          border: 1px solid #e5e7eb;
         }
-        .bank-badge.bni {
-          background: #ff6600;
-        }
-        .bank-badge.bsi {
-          background: #0066cc;
+        .bank-badge img {
+          height: 20px;
+          width: auto;
+          max-width: 55px;
+          object-fit: contain;
         }
         .bank-account {
           font-weight: 700;
@@ -436,17 +437,17 @@ export default function Admin() {
             </div>
             <div class="bank-list">
               <div class="bank-item">
-                <span class="bank-badge bni">BNI</span>
+                <span class="bank-badge"><img src="${bniBankLogo}" alt="BNI" /></span>
                 <span class="bank-account">555 - 8800 - 585</span>
-                <span class="bank-name">a.n. Lingkar Insan Keb...</span>
+                <span class="bank-name">a.n. Lingkar Insan Kebaikan</span>
               </div>
               <div class="bank-item">
-                <span class="bank-badge bsi">BSI</span>
+                <span class="bank-badge"><img src="${bsiBankLogo}" alt="BSI" /></span>
                 <span class="bank-account">730 - 8910 - 045</span>
-                <span class="bank-name">a.n. Wakaf Produktif K...</span>
+                <span class="bank-name">a.n. Wakaf Produktif Kebaikan</span>
               </div>
               <div class="bank-item">
-                <span class="bank-badge bsi">BSI</span>
+                <span class="bank-badge"><img src="${bsiBankLogo}" alt="BSI" /></span>
                 <span class="bank-account">730 - 8910 - 339</span>
                 <span class="bank-name">a.n. Solidaritas Al Aqsha</span>
               </div>
